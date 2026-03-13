@@ -1,8 +1,23 @@
 import express from "express";
 import bodyParser from "body-parser";
+import pg from "pg";
+import dotenv from "dotenv";
+
+dotenv.config();
+
 
 const app = express();
-const port = 3000;
+app.set("view engine", "ejs");
+const port = process.env.PORT;
+const db = new pg.Client({
+  user: process.env.DB_USER,
+  host: process.env.DB_HOST,
+  database: process.env.DB_NAME,
+  password: process.env.DB_PASSWORD,
+  port: process.env.DB_PORT,
+});
+db.connect().catch(err => console.log("Database connection error:", err));
+
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
@@ -20,11 +35,49 @@ app.get("/register", (req, res) => {
 });
 
 app.post("/register", async (req, res) => {
-  console.log(req.body.username);
-  console.log(req.body.password);
+  try {
+    const email = req.body.username;
+    const password = req.body.password;
+    const checkResult = await db.query(
+      "SELECT * FROM users WHERE email = $1",
+      [email]
+    );
+    if(checkResult.rows.length > 0) {
+      res.send("Email already exists. Try logging in.");
+    } 
+    else {
+      const result = await db.query(
+        "INSERT INTO users (email, password) VALUES ($1, $2)",
+        [email, password]
+      );
+      console.log(result); 
+      res.render("secrets.ejs");
+    }
+  } catch (err) {
+    console.error("Register error:", err);
+    res.status(500).send("Error registering user");
+  }
 });
 
-app.post("/login", async (req, res) => {});
+app.post("/login", async (req, res) => {
+  try {
+    const email = req.body.username;
+    const password = req.body.password;
+    // accessing the database to check if the user exists and the password matches
+    const result = await db.query(
+      "SELECT * FROM users WHERE email = $1 AND password = $2",
+      [email, password]
+    );
+    if (result.rows.length > 0) {
+      res.render("secrets.ejs");
+    } else {
+      res.send("Invalid email or password. Please try again.");
+    }
+  } catch (err) {
+    console.error("Login error:", err);
+    res.status(500).send("Error logging in");
+  }
+});
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
