@@ -2,9 +2,12 @@ import express from "express";
 import bodyParser from "body-parser";
 import pg from "pg";
 import dotenv from "dotenv";
+import bcrypt from "bcrypt";
 
 dotenv.config();
 
+// the more the salt rounds the more the password is encryptes but it also takes more time to hash the password
+const saltRounds = process.env.SALT_ROUNDS ;
 
 const app = express();
 app.set("view engine", "ejs");
@@ -46,12 +49,21 @@ app.post("/register", async (req, res) => {
       res.send("Email already exists. Try logging in.");
     } 
     else {
-      const result = await db.query(
-        "INSERT INTO users (email, password) VALUES ($1, $2)",
-        [email, password]
-      );
-      console.log(result); 
-      res.render("secrets.ejs");
+      // hashing the password before storing it in the database
+      bcrypt.hash(password, saltRounds, async (err, hash) => {
+        if (err) {
+          console.error("Hashing error:", err);
+          throw err;
+        }
+        else{
+          const result = await db.query(
+            "INSERT INTO users (email, password) VALUES ($1, $2)",
+            [email, hash]
+          );
+          console.log(result); 
+          res.render("secrets.ejs");
+        }
+      });
     }
   } catch (err) {
     console.error("Register error:", err);
@@ -65,11 +77,26 @@ app.post("/login", async (req, res) => {
     const password = req.body.password;
     // accessing the database to check if the user exists and the password matches
     const result = await db.query(
-      "SELECT * FROM users WHERE email = $1 AND password = $2",
-      [email, password]
+      "SELECT * FROM users WHERE email = $1 ",
+      [email]
     );
     if (result.rows.length > 0) {
-      res.render("secrets.ejs");
+      const user = result.rows[0];
+      const storesdHash = user.password;
+      // comparing the password entered by the user with the hashed password stored in the database
+      bcrypt.compare(password, storesdHash, (err, isMatch) => {
+        if (err) {
+          console.error("Comparison error:", err);
+          throw err;
+        }
+        else{
+          if (isMatch) {
+            res.render("secrets.ejs");
+          } else {
+            res.send("Invalid email or password. Please try again.");
+          } 
+        }
+      });
     } else {
       res.send("Invalid email or password. Please try again.");
     }
