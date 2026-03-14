@@ -1,41 +1,200 @@
 <%- include('partials/header') %>
-  <div class="container mt-5">
-    <h1>Register</h1>
 
-    <div class="row">
-      <div class="col-sm-8">
-        <div class="card">
-          <div class="card-body">
+<div class="container">
+  <div class="card">
+    <!-- Header Section -->
+    <div class="card-header">
+      <h1>Create Account</h1>
+      <p>Join our community and start sharing your secrets securely</p>
+    </div>
 
-            <!-- Makes POST request to /register route -->
-            <form action="/register" method="POST">
-              <div class="form-group">
-                <label for="email">Email</label>
-                <input type="email" class="form-control" name="username">
-              </div>
-              <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" class="form-control" name="password">
-              </div>
-              <button type="submit" class="btn btn-dark">Register</button>
-            </form>
+    <!-- Form Section -->
+    <div class="card-body">
+      <form action="/register" method="POST" id="registerForm">
 
+        <!-- Email Field -->
+        <div class="form-group">
+          <label for="email" class="form-label">Email Address</label>
+          <div class="form-group-wrapper">
+            <i class="fas fa-envelope form-group-icon"></i>
+            <input 
+              type="email" 
+              id="email"
+              class="form-control" 
+              name="username" 
+              placeholder="your.email@example.com"
+              required
+              autocomplete="email"
+            >
           </div>
+          <small class="helper-text" id="emailHelper" style="display:none;">
+            <i class="fas fa-check-circle success"></i> <span class="success">Valid email format</span>
+          </small>
+          <small class="helper-text error" id="emailError" style="display:none;">
+            <i class="fas fa-exclamation-circle"></i> <span>Invalid email format</span>
+          </small>
         </div>
+
+        <!-- Password Field -->
+        <div class="form-group">
+          <label for="password" class="form-label">Password</label>
+          <div class="form-group-wrapper">
+            <i class="fas fa-lock form-group-icon"></i>
+            <input 
+              type="password" 
+              id="password"
+              class="form-control" 
+              name="password" 
+              placeholder="Create a strong password"
+              required
+              autocomplete="new-password"
+              minlength="8"
+            >
+          </div>
+          
+          <!-- Password Strength Indicator -->
+          <div class="password-strength" id="passwordStrength">
+            <div class="password-strength-meter" id="passwordMeter"></div>
+          </div>
+          <div class="password-strength-text" id="passwordText" style="display:none;"></div>
+          
+          <!-- Password Requirements -->
+          <small class="helper-text text-muted" style="margin-top: 12px; display: flex; flex-direction: column; gap: 6px;">
+            <span><i class="fas fa-info-circle"></i> Password requirements:</span>
+            <div style="margin-left: 20px; font-size: 0.75rem;">
+              <span id="req-length"><i class="far fa-circle"></i> At least 8 characters</span><br>
+              <span id="req-upper"><i class="far fa-circle"></i> One uppercase letter</span><br>
+              <span id="req-number"><i class="far fa-circle"></i> One number</span>
+            </div>
+          </small>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="btn btn-dark" id="submitBtn" role="button" style="margin-top: 28px;">
+          <span class="button-text">Create Account</span>
+          <i class="fas fa-spinner loading" style="display:none; margin-left: 8px;"></i>
+        </button>
+
+      </form>
+
+      <!-- Divider -->
+      <div class="divider" style="margin: 32px 0;">
+        <span>Already registered?</span>
       </div>
 
-      <!-- <div class="col-sm-4">
-      <div class="card social-block">
-        <div class="card-body">
-          <a class="btn btn-block" href="/auth/google" role="button">
-            <i class="fab fa-google"></i>
-            Sign Up with Google
-          </a>
-        </div>
+      <!-- Auth Link Section -->
+      <div class="auth-link" style="border-top: none; margin-top: 0; padding-top: 0;">
+        <p>Already have an account? <a href="/login">Sign in here</a></p>
       </div>
-    </div> -->
-
     </div>
   </div>
+</div>
 
-  <%- include('partials/header') %>
+<script>
+// Password strength checker
+function checkPasswordStrength(password) {
+  let strength = 0;
+  const requirements = {
+    length: password.length >= 8,
+    uppercase: /[A-Z]/.test(password),
+    number: /\d/.test(password),
+    lowercase: /[a-z]/.test(password),
+    special: /[!@#$%^&*]/.test(password)
+  };
+
+  // Update requirements indicators
+  document.getElementById('req-length').innerHTML = 
+    `<i class="fas fa-${requirements.length ? 'check-circle' : 'circle'}"></i> At least 8 characters`;
+  document.getElementById('req-upper').innerHTML = 
+    `<i class="fas fa-${requirements.uppercase ? 'check-circle' : 'circle'}"></i> One uppercase letter`;
+  document.getElementById('req-number').innerHTML = 
+    `<i class="fas fa-${requirements.number ? 'check-circle' : 'circle'}"></i> One number`;
+
+  if (requirements.length) strength++;
+  if (requirements.uppercase) strength++;
+  if (requirements.number) strength++;
+  if (requirements.lowercase) strength++;
+  if (requirements.special) strength++;
+
+  // Show strength meter if password exists
+  const strengthEl = document.getElementById('passwordStrength');
+  const textEl = document.getElementById('passwordText');
+
+  if (password.length > 0) {
+    strengthEl.classList.add('show');
+    textEl.style.display = 'block';
+
+    const meter = document.getElementById('passwordMeter');
+    meter.className = 'password-strength-meter';
+
+    if (strength <= 2) {
+      meter.classList.add('weak');
+      textEl.className = 'password-strength-text weak';
+      textEl.innerText = '⚠️ Weak password - Add variety to your password';
+    } else if (strength <= 3) {
+      meter.classList.add('fair');
+      textEl.className = 'password-strength-text fair';
+      textEl.innerText = '📊 Fair password - Consider adding special characters';
+    } else {
+      meter.classList.add('good');
+      textEl.className = 'password-strength-text good';
+      textEl.innerText = '✓ Strong password - Great security!';
+    }
+  } else {
+    strengthEl.classList.remove('show');
+    textEl.style.display = 'none';
+  }
+}
+
+// Email validation
+document.getElementById('email').addEventListener('input', function() {
+  const emailHelper = document.getElementById('emailHelper');
+  const emailError = document.getElementById('emailError');
+  const isValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.value);
+
+  if (this.value) {
+    if (isValid) {
+      emailHelper.style.display = 'flex';
+      emailError.style.display = 'none';
+    } else {
+      emailHelper.style.display = 'none';
+      emailError.style.display = 'flex';
+    }
+  } else {
+    emailHelper.style.display = 'none';
+    emailError.style.display = 'none';
+  }
+});
+
+// Password strength on input
+document.getElementById('password').addEventListener('input', function() {
+  checkPasswordStrength(this.value);
+});
+
+// Form submission with validation and loading state
+document.getElementById('registerForm').addEventListener('submit', function(e) {
+  const password = document.getElementById('password').value;
+  const email = document.getElementById('email').value;
+
+  // Basic validation
+  if (password.length < 8) {
+    e.preventDefault();
+    alert('Password must be at least 8 characters long');
+    return;
+  }
+
+  if (!email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+    e.preventDefault();
+    alert('Please enter a valid email address');
+    return;
+  }
+
+  // Show loading state
+  const btn = this.querySelector('.btn-dark');
+  const spinner = btn.querySelector('.loading');
+  btn.disabled = true;
+  spinner.style.display = 'inline-block';
+});
+</script>
+
+<%- include('partials/footer') %>

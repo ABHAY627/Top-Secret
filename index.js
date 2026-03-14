@@ -82,9 +82,9 @@ app.post("/login", async (req, res) => {
     );
     if (result.rows.length > 0) {
       const user = result.rows[0];
-      const storesdHash = user.password;
+      const storedHash = user.password;
       // comparing the password entered by the user with the hashed password stored in the database
-      bcrypt.compare(password, storesdHash, (err, isMatch) => {
+      bcrypt.compare(password, storedHash, (err, isMatch) => {
         if (err) {
           console.error("Comparison error:", err);
           throw err;
