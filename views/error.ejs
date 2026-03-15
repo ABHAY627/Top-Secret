@@ -1,0 +1,357 @@
+<%- include('partials/header') %>
+
+<div class="container">
+  <div class="card error-card">
+    <!-- Error Header Section -->
+    <div class="card-header error-header">
+      <div class="error-icon-container">
+        <i class="<%= iconClass %>"></i>
+      </div>
+      <h1><%= title %></h1>
+      <p><%= subtitle %></p>
+    </div>
+
+    <!-- Error Body Section -->
+    <div class="card-body error-body">
+      <!-- Main Error Message -->
+      <div class="error-message-container">
+        <div class="error-message-box">
+          <i class="fas fa-exclamation-circle error-indicator"></i>
+          <p class="error-message-text"><%= message %></p>
+        </div>
+      </div>
+
+      <!-- Suggestions Section -->
+      <% if (suggestions && suggestions.length > 0) { %>
+        <div class="error-suggestions">
+          <h3><i class="fas fa-lightbulb"></i> What you can do:</h3>
+          <ul class="suggestions-list">
+            <% suggestions.forEach(suggestion => { %>
+              <li>
+                <span class="suggestion-icon"><i class="fas fa-arrow-right"></i></span>
+                <span class="suggestion-text"><%= suggestion %></span>
+              </li>
+            <% }) %>
+          </ul>
+        </div>
+      <% } %>
+
+      <!-- Action Section -->
+      <div class="error-actions">
+        <a href="<%= actionUrl %>" class="btn btn-dark error-action-btn">
+          <i class="fas fa-arrow-left"></i>
+          <%= actionLabel %>
+        </a>
+        <% if (secondaryUrl) { %>
+          <a href="<%= secondaryUrl %>" class="btn btn-light error-secondary-btn">
+            <i class="fas fa-home"></i>
+            Back to Home
+          </a>
+        <% } %>
+      </div>
+
+      <!-- Additional Help Info -->
+      <div class="error-footer">
+        <p>
+          <i class="fas fa-info-circle"></i>
+          Need help? Make sure you're following all the required steps. If you continue to experience issues, try again or contact support.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* ━━━━━━━━━━━━━━━━━━ ERROR PAGE SPECIFIC STYLES ━━━━━━━━━━━━━━━━━━ */
+  
+  .error-card {
+    border-color: #fecaca !important;
+  }
+  
+  .error-card:hover {
+    box-shadow: 
+      0 40px 130px rgba(239, 68, 68, 0.15),
+      0 0 1px rgba(255, 255, 255, 0.5) inset !important;
+    border-color: rgba(239, 68, 68, 0.2) !important;
+  }
+  
+  .error-header {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+  }
+  
+  .error-header::before {
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.12) 0%, transparent 70%) !important;
+  }
+  
+  .error-header::after {
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%) !important;
+  }
+  
+  .error-icon-container {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 25px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(255, 255, 255, 0.25);
+    animation: pulse-error 2s ease-in-out infinite;
+  }
+  
+  .error-icon-container i {
+    font-size: 2.5rem;
+    color: #ffffff;
+  }
+  
+  @keyframes pulse-error {
+    0%, 100% {
+      transform: scale(1);
+      box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+    }
+    50% {
+      transform: scale(1.05);
+      box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+    }
+  }
+  
+  .error-header h1 {
+    color: #ffffff !important;
+    margin: 15px 0 10px 0;
+    font-size: 2rem;
+  }
+  
+  .error-header p {
+    color: rgba(255, 255, 255, 0.9) !important;
+    font-size: 0.95rem;
+    margin: 0;
+  }
+  
+  .error-body {
+    padding: 50px 40px;
+  }
+  
+  .error-message-container {
+    margin-bottom: 35px;
+  }
+  
+  .error-message-box {
+    background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+    border-left: 5px solid #ef4444;
+    border-radius: 12px;
+    padding: 25px 25px;
+    display: flex;
+    gap: 18px;
+    align-items: flex-start;
+    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.08);
+    animation: slideInLeft 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s backwards;
+  }
+  
+  .error-indicator {
+    color: #ef4444;
+    font-size: 1.4rem;
+    flex-shrink: 0;
+    margin-top: 3px;
+  }
+  
+  .error-message-text {
+    color: #7f1d1d !important;
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.6;
+  }
+  
+  .error-suggestions {
+    margin: 40px 0;
+    padding: 30px;
+    background: linear-gradient(135deg, #f0fdf4 0%, #f1fdf4 100%);
+    border: 2px solid #dcfce7;
+    border-radius: 14px;
+    animation: slideInLeft 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.35s backwards;
+  }
+  
+  .error-suggestions h3 {
+    color: #15803d !important;
+    margin: 0 0 20px 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1rem;
+  }
+  
+  .error-suggestions h3 i {
+    color: #22c55e;
+    font-size: 1.1rem;
+  }
+  
+  .suggestions-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .suggestions-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 0;
+    color: #166534;
+  }
+  
+  .suggestion-icon {
+    color: #22c55e;
+    font-size: 0.8rem;
+    margin-top: 4px;
+    flex-shrink: 0;
+  }
+  
+  .suggestion-text {
+    font-weight: 500;
+    line-height: 1.5;
+  }
+  
+  .error-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin: 40px 0;
+  }
+  
+  .error-action-btn,
+  .error-secondary-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 16px 30px !important;
+    text-decoration: none;
+    font-weight: 700;
+    border-radius: 12px !important;
+    transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    animation: slideInUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.4s backwards;
+  }
+  
+  .error-action-btn {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+    color: #ffffff !important;
+    box-shadow: 0 12px 40px rgba(239, 68, 68, 0.28) !important;
+  }
+  
+  .error-action-btn:hover {
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%) !important;
+    box-shadow: 0 20px 65px rgba(239, 68, 68, 0.42) !important;
+    transform: translateY(-3px);
+  }
+  
+  .error-secondary-btn {
+    background-color: #f8fafc !important;
+    color: #ef4444 !important;
+    border: 2.5px solid #ef4444 !important;
+    box-shadow: 0 10px 30px rgba(239, 68, 68, 0.12) !important;
+  }
+  
+  .error-secondary-btn:hover {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+    color: #ffffff !important;
+    box-shadow: 0 18px 55px rgba(239, 68, 68, 0.35) !important;
+    transform: translateY(-2px);
+    border-color: transparent !important;
+  }
+  
+  .error-footer {
+    margin-top: 40px;
+    padding: 25px;
+    background: linear-gradient(135deg, #f5f3ff 0%, #faf5ff 100%);
+    border: 2px solid #ede9fe;
+    border-radius: 12px;
+    text-align: center;
+  }
+  
+  .error-footer p {
+    color: #6b21a8 !important;
+    font-size: 0.9rem;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+  
+  .error-footer i {
+    color: #a78bfa;
+    font-size: 1rem;
+  }
+  
+  /* ━━━━━━━━━━━━━━━━━━ RESPONSIVE ERROR PAGE ━━━━━━━━━━━━━━━━━━ */
+  @media (max-width: 768px) {
+    .error-body {
+      padding: 40px 30px;
+    }
+    
+    .error-message-box {
+      flex-direction: column;
+      gap: 12px;
+    }
+    
+    .error-icon-container {
+      width: 70px;
+      height: 70px;
+    }
+    
+    .error-icon-container i {
+      font-size: 2rem;
+    }
+    
+    .error-header h1 {
+      font-size: 1.6rem;
+    }
+    
+    .error-actions {
+      flex-direction: column;
+      gap: 12px;
+    }
+    
+    .error-action-btn,
+    .error-secondary-btn {
+      width: 100% !important;
+      padding: 14px 24px !important;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .error-body {
+      padding: 30px 20px;
+    }
+    
+    .error-message-box {
+      padding: 20px;
+    }
+    
+    .error-header h1 {
+      font-size: 1.4rem;
+    }
+    
+    .error-icon-container {
+      width: 65px;
+      height: 65px;
+    }
+    
+    .error-suggestions {
+      padding: 20px;
+      margin: 30px 0;
+    }
+    
+    .error-suggestions h3 {
+      font-size: 0.95rem;
+      margin-bottom: 15px;
+    }
+  }
+</style>
+
+<%- include('partials/footer') %>
